@@ -31,7 +31,10 @@ enum Theme {
         static let rose = Color(red: 0.890, green: 0.365, blue: 0.416)       // #e35d6a
     }
 
-    enum Type {
+    /// Named `Typography` and not `Type`: Swift reserves `Foo.Type` for the
+    /// metatype, so `Theme.Type.heading` does not parse as a member lookup at
+    /// all — the compiler reports it as "type member must not be named Type".
+    enum Typography {
         /// A hero title, and nothing else.
         static let display = Font.system(size: 40, weight: .bold)
         static let title = Font.system(size: 24, weight: .bold)

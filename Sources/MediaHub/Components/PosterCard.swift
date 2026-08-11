@@ -82,14 +82,14 @@ struct PosterCard: View {
     private var caption: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(item.name)
-                .font(Theme.Type.label)
+                .font(Theme.Typography.label)
                 .foregroundStyle(Theme.Palette.bone)
                 .lineLimit(2, reservesSpace: true)
                 .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
 
             Text(subtitle)
-                .font(Theme.Type.caption)
+                .font(Theme.Typography.caption)
                 .foregroundStyle(Theme.Palette.dim)
                 .lineLimit(1)
         }

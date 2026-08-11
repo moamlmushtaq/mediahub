@@ -129,20 +129,20 @@ struct HeroView: View {
     private var details: some View {
         VStack(alignment: .trailing, spacing: Theme.space(3)) {
             Text(item.name)
-                .font(Theme.Type.display)
+                .font(Theme.Typography.display)
                 .foregroundStyle(Theme.Palette.bone)
                 .lineLimit(2)
                 .multilineTextAlignment(.trailing)
 
             if !meta.isEmpty {
                 Text(meta)
-                    .font(Theme.Type.label)
+                    .font(Theme.Typography.label)
                     .foregroundStyle(Theme.Palette.ash)
             }
 
             if !item.overview.isEmpty {
                 Text(item.overview)
-                    .font(Theme.Type.body)
+                    .font(Theme.Typography.body)
                     .foregroundStyle(Theme.Palette.ash)
                     .lineLimit(3)
                     .multilineTextAlignment(.trailing)
@@ -154,7 +154,7 @@ struct HeroView: View {
                     onDetails(item)
                 } label: {
                     Label("التفاصيل", systemImage: "info.circle")
-                        .font(Theme.Type.label)
+                        .font(Theme.Typography.label)
                         .foregroundStyle(Theme.Palette.bone)
                         .padding(.horizontal, Theme.space(5))
                         .padding(.vertical, Theme.space(2.5))
@@ -170,7 +170,7 @@ struct HeroView: View {
                         item.type == .series ? "استعراض" : (isResuming ? "متابعة" : "تشغيل"),
                         systemImage: item.type == .series ? "square.grid.2x2" : "play.fill"
                     )
-                    .font(Theme.Type.heading)
+                    .font(Theme.Typography.heading)
                     .foregroundStyle(Theme.Palette.ink)
                     .padding(.horizontal, Theme.space(6))
                     .padding(.vertical, Theme.space(2.5))

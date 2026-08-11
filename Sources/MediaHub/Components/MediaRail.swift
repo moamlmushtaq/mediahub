@@ -18,7 +18,7 @@ struct MediaRail: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.space(3)) {
             Text(title)
-                .font(Theme.Type.heading)
+                .font(Theme.Typography.heading)
                 .foregroundStyle(Theme.Palette.bone)
                 .padding(.horizontal, Theme.space(8))
 

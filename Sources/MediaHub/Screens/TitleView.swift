@@ -105,7 +105,7 @@ struct TitleView: View {
 
                 VStack(alignment: .trailing, spacing: Theme.space(3)) {
                     Text(detail.card.name)
-                        .font(Theme.Type.display)
+                        .font(Theme.Typography.display)
                         .foregroundStyle(Theme.Palette.bone)
                         .multilineTextAlignment(.trailing)
 
@@ -113,23 +113,23 @@ struct TitleView: View {
                     // repeating the same string twice looks like a bug.
                     if let original = detail.card.originalTitle, original != detail.card.name {
                         Text(original)
-                            .font(Theme.Type.body)
+                            .font(Theme.Typography.body)
                             .foregroundStyle(Theme.Palette.dim)
                     }
 
                     Text(meta(detail))
-                        .font(Theme.Type.label)
+                        .font(Theme.Typography.label)
                         .foregroundStyle(Theme.Palette.ash)
 
                     if !detail.tagline.isEmpty {
                         Text(detail.tagline)
-                            .font(Theme.Type.body.italic())
+                            .font(Theme.Typography.body.italic())
                             .foregroundStyle(Theme.Palette.gold)
                     }
 
                     if !detail.card.overview.isEmpty {
                         Text(detail.card.overview)
-                            .font(Theme.Type.body)
+                            .font(Theme.Typography.body)
                             .foregroundStyle(Theme.Palette.ash)
                             .multilineTextAlignment(.trailing)
                             .frame(maxWidth: 620, alignment: .trailing)
@@ -160,7 +160,7 @@ struct TitleView: View {
                 onPlay(detail.card)
             } label: {
                 Label(resuming ? "متابعة" : "تشغيل", systemImage: "play.fill")
-                    .font(Theme.Type.heading)
+                    .font(Theme.Typography.heading)
                     .foregroundStyle(Theme.Palette.ink)
                     .padding(.horizontal, Theme.space(7))
                     .padding(.vertical, Theme.space(3))
@@ -171,7 +171,7 @@ struct TitleView: View {
 
             if resuming {
                 Text("من \(detail.card.startingPoint.timecode)")
-                    .font(Theme.Type.label)
+                    .font(Theme.Typography.label)
                     .foregroundStyle(Theme.Palette.dim)
             }
         }
@@ -212,7 +212,7 @@ struct TitleView: View {
                 Spacer()
 
                 Text("الحلقات")
-                    .font(Theme.Type.heading)
+                    .font(Theme.Typography.heading)
                     .foregroundStyle(Theme.Palette.bone)
             }
             .padding(.horizontal, Theme.space(8))
@@ -221,7 +221,7 @@ struct TitleView: View {
                 ProgressView().controlSize(.small).frame(maxWidth: .infinity)
             } else if model.episodes.isEmpty {
                 Text("لا توجد حلقات في هذا الموسم.")
-                    .font(Theme.Type.body)
+                    .font(Theme.Typography.body)
                     .foregroundStyle(Theme.Palette.dim)
                     .padding(.horizontal, Theme.space(8))
             } else {
@@ -245,7 +245,7 @@ struct TitleView: View {
     private func castSection(_ people: [Person]) -> some View {
         VStack(alignment: .trailing, spacing: Theme.space(4)) {
             Text("طاقم العمل")
-                .font(Theme.Type.heading)
+                .font(Theme.Typography.heading)
                 .foregroundStyle(Theme.Palette.bone)
                 .padding(.horizontal, Theme.space(8))
 
@@ -259,14 +259,14 @@ struct TitleView: View {
                                 .overlay(Circle().strokeBorder(Theme.Palette.hair, lineWidth: 1))
 
                             Text(person.name)
-                                .font(Theme.Type.caption)
+                                .font(Theme.Typography.caption)
                                 .foregroundStyle(Theme.Palette.bone)
                                 .lineLimit(2, reservesSpace: true)
                                 .multilineTextAlignment(.center)
 
                             if !person.role.isEmpty {
                                 Text(person.role)
-                                    .font(Theme.Type.caption)
+                                    .font(Theme.Typography.caption)
                                     .foregroundStyle(Theme.Palette.dim)
                                     .lineLimit(1)
                             }
@@ -306,14 +306,14 @@ struct EpisodeRow: View {
                                 .foregroundStyle(Theme.Palette.gold)
                         }
                         Text(episode.name)
-                            .font(Theme.Type.label)
+                            .font(Theme.Typography.label)
                             .foregroundStyle(Theme.Palette.bone)
                             .lineLimit(1)
                     }
 
                     if !episode.overview.isEmpty {
                         Text(episode.overview)
-                            .font(Theme.Type.caption)
+                            .font(Theme.Typography.caption)
                             .foregroundStyle(Theme.Palette.dim)
                             .lineLimit(2)
                             .multilineTextAlignment(.trailing)
@@ -323,12 +323,12 @@ struct EpisodeRow: View {
                         Spacer()
                         if let runtime = episode.runtimeMinutes {
                             Text("\(runtime) دقيقة")
-                                .font(Theme.Type.caption)
+                                .font(Theme.Typography.caption)
                                 .foregroundStyle(Theme.Palette.dim)
                         }
                         if let code = episode.episodeCode {
                             Text(code)
-                                .font(Theme.Type.caption.monospaced())
+                                .font(Theme.Typography.caption.monospaced())
                                 .foregroundStyle(Theme.Palette.dim)
                         }
                     }

@@ -121,11 +121,11 @@ struct PlayerView: View {
 
                 VStack(alignment: .trailing, spacing: 1) {
                     Text(request.title)
-                        .font(Theme.Type.heading)
+                        .font(Theme.Typography.heading)
                         .foregroundStyle(.white)
                     if let subtitle = request.subtitle {
                         Text(subtitle)
-                            .font(Theme.Type.caption)
+                            .font(Theme.Typography.caption)
                             .foregroundStyle(.white.opacity(0.7))
                     }
                 }

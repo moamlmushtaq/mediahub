@@ -52,11 +52,11 @@ struct LoginView: View {
                 .frame(width: 76, height: 76)
 
             Text("ميديا هَب")
-                .font(Theme.Type.title)
+                .font(Theme.Typography.title)
                 .foregroundStyle(Theme.Palette.bone)
 
             Text("مكتبة خاصة")
-                .font(Theme.Type.label)
+                .font(Theme.Typography.label)
                 .foregroundStyle(Theme.Palette.dim)
         }
     }
@@ -87,14 +87,14 @@ struct LoginView: View {
         // is why the last session ended, the other is why this attempt failed.
         if let error {
             Label(error, systemImage: "exclamationmark.triangle.fill")
-                .font(Theme.Type.label)
+                .font(Theme.Typography.label)
                 .foregroundStyle(Theme.Palette.rose)
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .transition(.opacity)
         } else if let notice {
             Text(notice)
-                .font(Theme.Type.label)
+                .font(Theme.Typography.label)
                 .foregroundStyle(Theme.Palette.ash)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -112,7 +112,7 @@ struct LoginView: View {
                         .tint(Theme.Palette.ink)
                 }
             }
-            .font(Theme.Type.heading)
+            .font(Theme.Typography.heading)
             .foregroundStyle(Theme.Palette.ink)
             .frame(maxWidth: .infinity)
             .padding(.vertical, Theme.space(2.5))
@@ -161,7 +161,7 @@ private struct LoginField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.space(1.5)) {
             Text(title)
-                .font(Theme.Type.caption)
+                .font(Theme.Typography.caption)
                 .foregroundStyle(Theme.Palette.dim)
 
             Group {
@@ -172,7 +172,7 @@ private struct LoginField: View {
                 }
             }
             .textFieldStyle(.plain)
-            .font(Theme.Type.body)
+            .font(Theme.Typography.body)
             .foregroundStyle(Theme.Palette.bone)
             .padding(.horizontal, Theme.space(3))
             .padding(.vertical, Theme.space(2.5))

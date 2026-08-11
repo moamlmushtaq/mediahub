@@ -139,7 +139,7 @@ struct LibraryShell: View {
                 .foregroundStyle(Theme.Palette.gold)
 
             Text(app.viewer?.name ?? "")
-                .font(Theme.Type.label)
+                .font(Theme.Typography.label)
                 .foregroundStyle(Theme.Palette.ash)
                 .lineLimit(1)
 

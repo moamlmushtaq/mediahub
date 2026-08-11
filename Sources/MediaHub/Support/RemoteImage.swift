@@ -29,7 +29,14 @@ final class ImageCache {
         return cache
     }()
 
-    private var inFlight: [URL: Task<NSImage?, Never>] = [:]
+    /// In-flight downloads carry `Data`, not `NSImage`.
+    ///
+    /// `NSImage` is not `Sendable` — it is a mutable AppKit object — so a
+    /// `Task<NSImage?, Never>` cannot have its result awaited from the main
+    /// actor under Swift 6. `Data` is `Sendable`, so the download crosses the
+    /// boundary and the image is constructed on this side of it. The compiler
+    /// caught this; it is a real rule, not a formality.
+    private var inFlight: [URL: Task<Data?, Never>] = [:]
 
     func cached(_ url: URL) -> NSImage? {
         cache.object(forKey: url as NSURL)
@@ -40,31 +47,34 @@ final class ImageCache {
 
         // Coalesce: a rail and a grid can ask for the same poster in the same
         // frame, and without this that is two downloads of identical bytes.
+        let task: Task<Data?, Never>
         if let existing = inFlight[url] {
-            return await existing.value
-        }
-
-        let task = Task<NSImage?, Never> {
-            let data: Data?
-            do {
-                var request = URLRequest(url: url)
-                request.cachePolicy = .returnCacheDataElseLoad
-                let (payload, response) = try await URLSession.shared.data(for: request)
-                let status = (response as? HTTPURLResponse)?.statusCode ?? 0
-                data = (200..<300).contains(status) ? payload : nil
-            } catch {
-                data = nil
+            task = existing
+        } else {
+            task = Task<Data?, Never> {
+                do {
+                    var request = URLRequest(url: url)
+                    request.cachePolicy = .returnCacheDataElseLoad
+                    let (payload, response) = try await URLSession.shared.data(for: request)
+                    let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+                    return (200..<300).contains(status) ? payload : nil
+                } catch {
+                    return nil
+                }
             }
-
-            guard let data, let image = NSImage(data: data) else { return nil }
-            return image
+            inFlight[url] = task
         }
 
-        inFlight[url] = task
-        let image = await task.value
+        let data = await task.value
         inFlight[url] = nil
 
-        if let image { cache.setObject(image, forKey: url as NSURL) }
+        // Re-check the cache: a second caller that joined the same download
+        // will have stored it already, and two `NSImage`s of the same bytes is
+        // twice the memory for nothing.
+        if let hit = cached(url) { return hit }
+
+        guard let data, let image = NSImage(data: data) else { return nil }
+        cache.setObject(image, forKey: url as NSURL)
         return image
     }
 }

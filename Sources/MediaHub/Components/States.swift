@@ -28,12 +28,12 @@ struct EmptyState: View {
                 .foregroundStyle(Theme.Palette.dim)
 
             Text(title)
-                .font(Theme.Type.heading)
+                .font(Theme.Typography.heading)
                 .foregroundStyle(Theme.Palette.bone)
 
             if let message {
                 Text(message)
-                    .font(Theme.Type.body)
+                    .font(Theme.Typography.body)
                     .foregroundStyle(Theme.Palette.dim)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 320)
@@ -58,7 +58,7 @@ struct FailureState: View {
             // the viewer, and replacing them with something generic throws away
             // the only specific thing on the screen.
             Text(message)
-                .font(Theme.Type.body)
+                .font(Theme.Typography.body)
                 .foregroundStyle(Theme.Palette.ash)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 380)
