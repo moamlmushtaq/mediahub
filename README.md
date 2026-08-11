@@ -2,9 +2,8 @@
 
 A native Mac client for a self-hosted media library, written in Swift.
 
-> **Status:** `MediaHubKit` — the API client, subtitle engine and playback logic —
-> is complete and tested. The SwiftUI/AVKit app layer on top of it is in
-> progress.
+> **Status:** complete and building. `MediaHubKit` carries 71 tests that run on
+> every commit; the SwiftUI/AVKit app builds and packages on macOS in CI.
 
 ---
 
@@ -26,6 +25,7 @@ media itself.
 Sources/
   MediaHubKit/     no AppKit, no SwiftUI, no AVFoundation — builds anywhere
   MediaHub/        SwiftUI + AVKit — needs a Mac
+Packaging/         assembles, signs and zips MediaHub.app
 ```
 
 This is not architectural decoration. It is developed on a Linux server, where
@@ -78,12 +78,31 @@ repository because `String.Encoding` has no `windowsCP1256` on Linux and only
 reaches it through CoreFoundation on macOS — a difference that would mean
 subtitle handling could not be tested where the project is developed.
 
+## What the app does
+
+A sidebar, a home screen of rows over a featured title, paged library grids
+with search, a detail page with seasons and cast, and a player.
+
+The player is `AVPlayerView` with the floating control bar, so Picture-in-
+Picture, AirPlay, full-screen and scrub previews are the system's own and
+behave the way people already expect. Rebuilding those in SwiftUI would take
+weeks and land recognisably not-quite-right. What is not the system's is
+subtitles: `AVPlayer` will not load an external file, so the app parses the
+`.srt` itself and draws it — which also means it controls the size, background
+and position, and gets Windows-1256 Arabic right.
+
+Now Playing and the media keys are wired, so a film shows up in Control Centre
+and F8 pauses it.
+
 ## Building
 
 ```bash
 swift test                        # the kit, anywhere Swift runs
 swift build -c release            # the app, on a Mac
+./Packaging/package.sh            # MediaHub.app, signed and zipped
 ```
+
+CI uploads the packaged app as an artifact on every green build.
 
 Requires Swift 6.2. The kit builds on Linux and macOS; the app target requires
 macOS 14 or later.
