@@ -1,0 +1,31 @@
+# Swift / SwiftPM
+.build/
+.swiftpm/
+Package.resolved
+*.xcodeproj
+*.xcworkspace
+DerivedData/
+
+# Build output
+dist/
+*.app
+*.dmg
+*.zip
+
+# Signing material — never in a repository, not even privately.
+# A certificate or a provisioning profile in git history is a credential that
+# cannot be withdrawn by deleting the file later.
+*.p12
+*.mobileprovision
+*.cer
+*.certSigningRequest
+AuthKey_*.p8
+
+# Anything carrying a server secret. The app reads its host from configuration
+# at runtime; nothing here should ever hold a key.
+.env
+.env.*
+*.local
+
+# macOS
+.DS_Store

@@ -1,0 +1,65 @@
+name: CI
+
+# Two machines, on purpose.
+#
+# The whole point of this project's layout is that the logic — the API client,
+# the subtitle parser, the resume arithmetic — carries no Apple frameworks and
+# can therefore be proved anywhere. The Linux job is what makes that claim
+# checkable rather than aspirational: if `MediaHubKit` ever grows an `import
+# AppKit`, this job goes red immediately, before the dependency has time to
+# spread through the module.
+#
+# The macOS job builds the app itself, which cannot be built anywhere else.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  kit:
+    name: MediaHubKit (Linux)
+    runs-on: ubuntu-latest
+    container: swift:6.2
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache build products
+        uses: actions/cache@v4
+        with:
+          path: .build
+          key: linux-spm-${{ hashFiles('Package.swift', 'Sources/**', 'Tests/**') }}
+          restore-keys: linux-spm-
+
+      - name: Test
+        run: swift test --target MediaHubKitTests
+
+      - name: Assert the kit stays platform-independent
+        # A grep, not a build flag, because the failure it prevents is silent:
+        # an `import AppKit` inside MediaHubKit still compiles on macOS and only
+        # breaks the day someone tries to test on anything else.
+        run: |
+          if grep -rnE '^import (AppKit|SwiftUI|AVKit|UIKit)' Sources/MediaHubKit/; then
+            echo "::error::MediaHubKit must not import an Apple UI or media framework"
+            exit 1
+          fi
+
+  app:
+    name: MediaHub.app (macOS)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show the toolchain
+        run: swift --version && xcodebuild -version
+
+      - name: Build
+        run: swift build -c release
+
+      - name: Test
+        run: swift test
