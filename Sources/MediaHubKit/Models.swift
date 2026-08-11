@@ -211,6 +211,14 @@ public struct Person: Codable, Hashable, Sendable, Identifiable {
     public let type: String
     public let imageTag: String?
 
+    public init(id: String, name: String, role: String, type: String, imageTag: String?) {
+        self.id = id
+        self.name = name
+        self.role = role
+        self.type = type
+        self.imageTag = imageTag
+    }
+
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try c.decode(String.self, forKey: .id)
@@ -229,6 +237,13 @@ public struct MediaSource: Codable, Hashable, Sendable, Identifiable {
     public let path: String
     public let container: String
     public let size: Int
+
+    public init(id: String, path: String, container: String, size: Int) {
+        self.id = id
+        self.path = path
+        self.container = container
+        self.size = size
+    }
 
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -253,6 +268,22 @@ public struct MediaDetail: Codable, Sendable, Identifiable {
     public let mediaSources: [MediaSource]
 
     public var id: String { card.id }
+
+    public init(
+        card: MediaCard,
+        genres: [String] = [],
+        studios: [String] = [],
+        people: [Person] = [],
+        tagline: String = "",
+        mediaSources: [MediaSource] = []
+    ) {
+        self.card = card
+        self.genres = genres
+        self.studios = studios
+        self.people = people
+        self.tagline = tagline
+        self.mediaSources = mediaSources
+    }
 
     public init(from decoder: any Decoder) throws {
         self.card = try MediaCard(from: decoder)
@@ -287,6 +318,14 @@ public struct Season: Codable, Hashable, Sendable, Identifiable {
     public let indexNumber: Int?
     public let imageTag: String?
     public let episodeCount: Int
+
+    public init(id: String, name: String, indexNumber: Int?, imageTag: String?, episodeCount: Int) {
+        self.id = id
+        self.name = name
+        self.indexNumber = indexNumber
+        self.imageTag = imageTag
+        self.episodeCount = episodeCount
+    }
 
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -325,6 +364,20 @@ public struct Episode: Codable, Hashable, Sendable, Identifiable {
         return String(format: "S%02dE%02d", seasonNumber, indexNumber)
     }
 
+    public init(
+        id: String, name: String, indexNumber: Int?, seasonNumber: Int?,
+        overview: String, runtimeMinutes: Int?, imageTag: String?, userData: UserItemData
+    ) {
+        self.id = id
+        self.name = name
+        self.indexNumber = indexNumber
+        self.seasonNumber = seasonNumber
+        self.overview = overview
+        self.runtimeMinutes = runtimeMinutes
+        self.imageTag = imageTag
+        self.userData = userData
+    }
+
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try c.decode(String.self, forKey: .id)
@@ -345,6 +398,11 @@ public struct Episode: Codable, Hashable, Sendable, Identifiable {
 public struct Genre: Codable, Hashable, Sendable, Identifiable {
     public let id: String
     public let name: String
+
+    public init(id: String, name: String) {
+        self.id = id
+        self.name = name
+    }
 }
 
 // MARK: - Endpoint payloads
@@ -353,6 +411,12 @@ public struct Viewer: Codable, Hashable, Sendable {
     public let id: Int
     public let slug: String
     public let name: String
+
+    public init(id: Int, slug: String, name: String) {
+        self.id = id
+        self.slug = slug
+        self.name = name
+    }
 }
 
 public struct Session: Codable, Hashable, Sendable {
@@ -360,6 +424,12 @@ public struct Session: Codable, Hashable, Sendable {
     /// Unix seconds. The server issues thirty days.
     public let expiresAt: Int
     public let viewer: Viewer
+
+    public init(token: String, expiresAt: Int, viewer: Viewer) {
+        self.token = token
+        self.expiresAt = expiresAt
+        self.viewer = viewer
+    }
 
     public var expiry: Date { Date(timeIntervalSince1970: TimeInterval(expiresAt)) }
 
@@ -378,6 +448,12 @@ public struct Rail: Codable, Hashable, Sendable, Identifiable {
 
     public var id: String { key }
 
+    public init(key: String, title: String, items: [MediaCard]) {
+        self.key = key
+        self.title = title
+        self.items = items
+    }
+
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         self.key = try c.decode(String.self, forKey: .key)
@@ -392,6 +468,11 @@ public struct Home: Codable, Hashable, Sendable {
     public let rails: [Rail]
     public let genres: [Genre]
 
+    public init(rails: [Rail], genres: [Genre]) {
+        self.rails = rails
+        self.genres = genres
+    }
+
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         self.rails = c.lossyArray(.rails)
@@ -404,6 +485,11 @@ public struct Home: Codable, Hashable, Sendable {
 public struct Page: Codable, Hashable, Sendable {
     public let items: [MediaCard]
     public let total: Int
+
+    public init(items: [MediaCard], total: Int) {
+        self.items = items
+        self.total = total
+    }
 
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -436,6 +522,14 @@ public struct SubtitleTrack: Codable, Hashable, Sendable, Identifiable {
     public let isDefault: Bool
 
     public var id: String { url }
+
+    public init(url: String, language: String?, label: String, forced: Bool, isDefault: Bool) {
+        self.url = url
+        self.language = language
+        self.label = label
+        self.forced = forced
+        self.isDefault = isDefault
+    }
 
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
