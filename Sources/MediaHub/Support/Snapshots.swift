@@ -48,15 +48,24 @@ enum Snapshots {
             LoginView(notice: "انتهت الجلسة. سجّل الدخول من جديد.").environment(app)
         }
 
-        write(name: "03-home", size: wide) {
+        // Tall enough to hold the whole page.
+        //
+        // Rendered into a 900-point canvas, the hero and two rails together
+        // needed 1,200 and the hero was squeezed until its bottom-aligned
+        // title and buttons fell outside the frame — which looked exactly like
+        // "the hero lost its text" rather than "the canvas is too short". A
+        // scrolled page has no such limit, so neither should its picture.
+        write(name: "03-home", size: CGSize(width: 1_440, height: 1_440)) {
             SnapshotHome().environment(app)
         }
 
-        write(name: "03b-shell", size: wide) {
+        write(name: "03b-shell", size: CGSize(width: 1_440, height: 1_440)) {
             SnapshotShell().environment(app)
         }
 
-        write(name: "04-hero", size: CGSize(width: 1_440, height: 460)) {
+        // Matches HeroView.height exactly; anything shorter clips the content
+        // it is meant to show.
+        write(name: "04-hero", size: CGSize(width: 1_440, height: HeroView.height)) {
             HeroView(item: Fixtures.complete, onPlay: { _ in }, onDetails: { _ in })
         }
 
