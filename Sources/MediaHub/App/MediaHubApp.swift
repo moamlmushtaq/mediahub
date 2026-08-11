@@ -70,22 +70,36 @@ struct LibraryShell: View {
 
     @State private var selection: Section? = .home
     @State private var path: [MediaCard] = []
+    @State private var playing: PlayRequest?
 
     var body: some View {
+        ZStack {
+            shell
+            // The player covers the whole window rather than arriving as a
+            // sheet. A macOS sheet is a small modal panel attached to the title
+            // bar; a film in one would be a postage stamp with rounded corners.
+            if let playing {
+                PlayerView(request: playing) { self.playing = nil }
+                    .transition(.opacity)
+                    .zIndex(1)
+            }
+        }
+        .animation(.easeInOut(duration: 0.2), value: playing)
+    }
+
+    private var shell: some View {
         NavigationSplitView {
             sidebar
         } detail: {
             NavigationStack(path: $path) {
                 content
                     .navigationDestination(for: MediaCard.self) { card in
-                        // Placeholder until the detail screen lands; it is
-                        // named honestly rather than left as an empty view, so
-                        // an unfinished path is obvious rather than looking
-                        // like a bug.
-                        EmptyState(
-                            symbol: "rectangle.stack",
-                            title: card.name,
-                            message: "صفحة التفاصيل قيد الإنشاء."
+                        TitleView(
+                            card: card,
+                            onPlay: play,
+                            onPlayEpisode: { episode, detail in
+                                playEpisode(episode, of: detail)
+                            }
                         )
                     }
             }
@@ -147,4 +161,37 @@ struct LibraryShell: View {
     private func open(_ card: MediaCard) {
         path.append(card)
     }
+
+    /// A film: straight to the player.
+    private func play(_ card: MediaCard) {
+        playing = PlayRequest(
+            id: card.id,
+            title: card.name,
+            subtitle: nil,
+            startAt: card.startingPoint
+        )
+    }
+
+    /// An episode: the series' name above the episode's, which is what a
+    /// player window's title bar should say.
+    private func playEpisode(_ episode: Episode, of detail: MediaDetail) {
+        let code = episode.episodeCode.map { "\($0) · " } ?? ""
+        playing = PlayRequest(
+            id: episode.id,
+            title: detail.card.name,
+            subtitle: code + episode.name,
+            startAt: episode.startingPoint
+        )
+    }
+}
+
+/// What the player needs to start, gathered before the window opens.
+///
+/// Passed as one value rather than several bindings because a half-populated
+/// presentation state is how a player ends up opening on the wrong item.
+struct PlayRequest: Identifiable, Hashable {
+    let id: String
+    let title: String
+    let subtitle: String?
+    let startAt: Ticks
 }
