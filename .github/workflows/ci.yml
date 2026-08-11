@@ -63,3 +63,24 @@ jobs:
 
       - name: Test
         run: swift test
+
+  package:
+    name: MediaHub.app
+    runs-on: macos-15
+    needs: [kit, app]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the bundle
+        run: ./Packaging/package.sh
+
+      # Uploaded on every green build rather than only on a tag: the machine
+      # this is developed on is not a Mac, so this artifact is the only way the
+      # author ever gets to hold the thing they wrote.
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: MediaHub-app
+          path: dist/*.zip
+          retention-days: 30
+          if-no-files-found: error
