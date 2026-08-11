@@ -37,7 +37,7 @@ jobs:
           restore-keys: linux-spm-
 
       - name: Test
-        run: swift test --target MediaHubKitTests
+        run: swift test
 
       - name: Assert the kit stays platform-independent
         # A grep, not a build flag, because the failure it prevents is silent:
