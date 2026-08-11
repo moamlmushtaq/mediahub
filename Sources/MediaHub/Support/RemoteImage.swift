@@ -92,35 +92,44 @@ struct RemoteImage: View {
     var placeholderSymbol: String = "film"
 
     @State private var image: NSImage?
-    @State private var didAttempt = false
+
+    /// Resolved on every evaluation rather than only in `.task`.
+    ///
+    /// Two things this fixes. A cached poster now appears in the *first* frame
+    /// instead of one frame of placeholder followed by a pop — which is what
+    /// made a scrolled grid shimmer. And it is what lets the snapshot renderer
+    /// see anything at all: `ImageRenderer` never runs `.task`, so an image
+    /// that is only assigned there renders as an empty box, which is exactly
+    /// how the first set of screenshots came back.
+    private var resolved: NSImage? {
+        if let image { return image }
+        guard let url else { return nil }
+        return ImageCache.shared.cached(url)
+    }
 
     var body: some View {
         ZStack {
-            if let image {
+            if let image = resolved {
                 Image(nsImage: image)
                     .resizable()
                     .aspectRatio(contentMode: contentMode)
             } else {
                 Placeholder(systemImage: placeholderSymbol)
-                    // Only the *first* attempt animates. Coming back to a
-                    // cached image should be instantaneous, not a fade — a
-                    // fade on every reappearance is what makes a grid shimmer.
-                    .opacity(didAttempt ? 1 : 1)
             }
         }
-        .animation(.easeOut(duration: 0.22), value: image != nil)
+        // Without this the view has no intrinsic size of its own and collapses
+        // to whatever the placeholder glyph measures — which is how a 460-point
+        // hero rendered as a tiny film icon floating in a black rectangle.
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .animation(.easeOut(duration: 0.22), value: resolved != nil)
         .task(id: url) {
             guard let url else {
                 image = nil
                 return
             }
             // Synchronous cache hit: no flash of placeholder at all.
-            if let hit = ImageCache.shared.cached(url) {
-                image = hit
-                return
-            }
+            if ImageCache.shared.cached(url) != nil { return }
             image = await ImageCache.shared.load(url)
-            didAttempt = true
         }
     }
 }

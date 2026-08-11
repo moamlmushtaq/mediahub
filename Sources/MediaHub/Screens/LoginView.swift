@@ -224,6 +224,11 @@ struct MediaHubMark: View {
             }
         }
         .aspectRatio(1, contentMode: .fit)
+        // Never mirrored. `layoutDirection` is right for text and for layout,
+        // and wrong for a logo: it turned the play triangle around so that the
+        // mark inside the app pointed the opposite way from the icon in the
+        // Dock.
+        .environment(\.layoutDirection, .leftToRight)
     }
 }
 

@@ -99,7 +99,11 @@ struct HeroView: View {
     private var isResuming: Bool { item.startingPoint.rawValue > 0 }
 
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
+        // `.leading`, not `.trailing`. In a right-to-left layout SwiftUI maps
+        // leading to the RIGHT edge — the first version used trailing and put
+        // the title, the summary and both buttons in the bottom-left corner of
+        // an Arabic screen.
+        ZStack(alignment: .bottomLeading) {
             RemoteImage(url: item.backdropURL(.backdropLarge), contentMode: .fill)
                 .frame(height: 460)
                 .clipped()
@@ -127,12 +131,12 @@ struct HeroView: View {
     }
 
     private var details: some View {
-        VStack(alignment: .trailing, spacing: Theme.space(3)) {
+        VStack(alignment: .leading, spacing: Theme.space(3)) {
             Text(item.name)
                 .font(Theme.Typography.display)
                 .foregroundStyle(Theme.Palette.bone)
                 .lineLimit(2)
-                .multilineTextAlignment(.trailing)
+                .multilineTextAlignment(.leading)
 
             if !meta.isEmpty {
                 Text(meta)
@@ -145,24 +149,11 @@ struct HeroView: View {
                     .font(Theme.Typography.body)
                     .foregroundStyle(Theme.Palette.ash)
                     .lineLimit(3)
-                    .multilineTextAlignment(.trailing)
-                    .frame(maxWidth: 560, alignment: .trailing)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: 560, alignment: .leading)
             }
 
             HStack(spacing: Theme.space(3)) {
-                Button {
-                    onDetails(item)
-                } label: {
-                    Label("التفاصيل", systemImage: "info.circle")
-                        .font(Theme.Typography.label)
-                        .foregroundStyle(Theme.Palette.bone)
-                        .padding(.horizontal, Theme.space(5))
-                        .padding(.vertical, Theme.space(2.5))
-                        .background(.white.opacity(0.14))
-                        .clipShape(Capsule())
-                }
-                .buttonStyle(.plain)
-
                 Button {
                     item.type == .series ? onDetails(item) : onPlay(item)
                 } label: {
@@ -176,6 +167,19 @@ struct HeroView: View {
                     .padding(.vertical, Theme.space(2.5))
                     .background(Theme.Palette.gold)
                     .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    onDetails(item)
+                } label: {
+                    Label("التفاصيل", systemImage: "info.circle")
+                        .font(Theme.Typography.label)
+                        .foregroundStyle(Theme.Palette.bone)
+                        .padding(.horizontal, Theme.space(5))
+                        .padding(.vertical, Theme.space(2.5))
+                        .background(.white.opacity(0.14))
+                        .clipShape(Capsule())
                 }
                 .buttonStyle(.plain)
             }

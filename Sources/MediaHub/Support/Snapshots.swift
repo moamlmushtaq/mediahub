@@ -61,18 +61,17 @@ enum Snapshots {
         }
 
         write(name: "05-grid", size: wide) {
-            ScrollView { PosterGrid(items: Fixtures.movies, onSelect: { _ in }) }
-                .pageBackground()
+            EagerGrid(items: Fixtures.movies, columns: 6)
         }
 
         write(name: "06-grid-narrow", size: narrow) {
-            ScrollView { PosterGrid(items: Fixtures.movies, onSelect: { _ in }) }
-                .pageBackground()
+            EagerGrid(items: Array(Fixtures.movies.prefix(6)), columns: 3)
         }
 
-        write(name: "07-rail", size: CGSize(width: 1_440, height: 340)) {
-            MediaRail(title: "تابع المشاهدة", items: Fixtures.movies, onSelect: { _ in })
+        write(name: "07-rail", size: CGSize(width: 1_440, height: 360)) {
+            EagerRail(title: "تابع المشاهدة", items: Array(Fixtures.movies.prefix(6)))
                 .padding(.vertical, Theme.space(6))
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .pageBackground()
         }
 
