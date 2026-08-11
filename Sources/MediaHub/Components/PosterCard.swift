@@ -37,30 +37,37 @@ struct PosterCard: View {
         .onHover { isHovering = $0 }
     }
 
+    /// The artwork, with its badges laid **over** it rather than beside it.
+    ///
+    /// `.overlay` and not a `ZStack`, and the difference is not stylistic. The
+    /// first version put the watched badge in the stack with
+    /// `.frame(maxHeight: .infinity)` to push it into a corner — and a child
+    /// asking for infinite height grows the stack, so a watched film rendered
+    /// half again as tall as every card beside it and dragged its row out of
+    /// alignment. An overlay is measured by what it covers, so it cannot.
     private var poster: some View {
-        ZStack(alignment: .bottom) {
-            RemoteImage(url: item.posterURL(), placeholderSymbol: symbol)
-                .frame(width: width, height: width / Theme.posterAspect)
-                .clipped()
-
-            if let progress {
-                ZStack(alignment: .leading) {
-                    Rectangle()
-                        .fill(.black.opacity(0.55))
-                    GeometryReader { geometry in
-                        Rectangle()
-                            .fill(Theme.Palette.gold)
-                            .frame(width: geometry.size.width * progress)
+        RemoteImage(url: item.posterURL(), placeholderSymbol: symbol)
+            .frame(width: width, height: width / Theme.posterAspect)
+            .clipped()
+            .overlay(alignment: .bottom) {
+                if let progress {
+                    ZStack(alignment: .leading) {
+                        Rectangle().fill(.black.opacity(0.55))
+                        GeometryReader { geometry in
+                            Rectangle()
+                                .fill(Theme.Palette.gold)
+                                .frame(width: geometry.size.width * progress)
+                        }
                     }
+                    .frame(height: 3)
                 }
-                .frame(height: 3)
             }
-
-            if item.userData.played {
-                watchedBadge
+            .overlay(alignment: .topLeading) {
+                // `.topLeading` is the top-RIGHT corner here, which is where a
+                // badge belongs on a right-to-left screen.
+                if item.userData.played { watchedBadge }
             }
-        }
-        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.medium, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.medium, style: .continuous))
         .hairlineBorder()
         // A lift rather than a glow: the hover state has to be legible against
         // artwork of every possible colour, and scale is the only cue that is.
@@ -76,7 +83,6 @@ struct PosterCard: View {
             .padding(4)
             .background(Theme.Palette.gold, in: Circle())
             .padding(Theme.space(2))
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
     }
 
     private var caption: some View {

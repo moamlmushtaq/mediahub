@@ -60,9 +60,10 @@ struct HomeView: View {
             )
         } else {
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: Theme.space(10)) {
+                LazyVStack(alignment: .leading, spacing: Theme.space(7)) {
                     if let featured = featured(in: home) {
                         HeroView(item: featured, onPlay: onPlay, onDetails: onSelect)
+                            .padding(.bottom, -Theme.space(3))
                     }
 
                     ForEach(home.rails) { rail in
@@ -105,30 +106,46 @@ struct HeroView: View {
         // an Arabic screen.
         ZStack(alignment: .bottomLeading) {
             RemoteImage(url: item.backdropURL(.backdropLarge), contentMode: .fill)
-                .frame(height: 460)
-                .clipped()
 
-            // Two gradients, not one. The bottom carries the text and has to
-            // reach full opacity; the side only has to keep the first line of
-            // a long title readable, and darkening the whole frame to do that
-            // would dim the artwork for nothing.
+            // The scrims exist to make text legible, and the first version made
+            // them so heavy that the artwork behind them was invisible — the
+            // hero read as a black rectangle with words on it, which is the
+            // opposite of what a hero is for. Both are lighter now, and both
+            // hold `.clear` for the first half so the top of the frame is the
+            // picture itself.
             LinearGradient(
-                colors: [.clear, Theme.Palette.ink.opacity(0.75), Theme.Palette.ink],
+                stops: [
+                    .init(color: .clear, location: 0),
+                    .init(color: Theme.Palette.ink.opacity(0.30), location: 0.48),
+                    .init(color: Theme.Palette.ink.opacity(0.88), location: 0.84),
+                    .init(color: Theme.Palette.ink, location: 1),
+                ],
                 startPoint: .top, endPoint: .bottom
             )
-            .frame(height: 460)
 
+            // Explicit unit points rather than `.leading`/`.trailing`: those are
+            // flipped by the layout direction, and a scrim needs to sit under
+            // the text wherever the text actually is — which here is the right.
             LinearGradient(
-                colors: [Theme.Palette.ink.opacity(0.85), .clear],
-                startPoint: .trailing, endPoint: .leading
+                stops: [
+                    .init(color: Theme.Palette.ink.opacity(0.72), location: 0),
+                    .init(color: Theme.Palette.ink.opacity(0.25), location: 0.45),
+                    .init(color: .clear, location: 0.8),
+                ],
+                startPoint: UnitPoint(x: 1, y: 0.5),
+                endPoint: UnitPoint(x: 0, y: 0.5)
             )
-            .frame(height: 460)
 
             details
         }
-        .frame(height: 460)
         .frame(maxWidth: .infinity)
+        .frame(height: Self.height)
+        .clipped()
     }
+
+    /// Tall enough to be a statement, short enough that the first rail shows
+    /// underneath and says there is more below.
+    static let height: CGFloat = 520
 
     private var details: some View {
         VStack(alignment: .leading, spacing: Theme.space(3)) {

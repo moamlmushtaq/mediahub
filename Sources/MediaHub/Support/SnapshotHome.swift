@@ -18,7 +18,7 @@ struct SnapshotHome: View {
         // have produces nothing at all. The first run of this renderer emitted
         // a solid black 1440x900 image for exactly that reason — which read as
         // "the home screen is broken" rather than "the screenshot is".
-        VStack(alignment: .leading, spacing: Theme.space(10)) {
+        VStack(alignment: .leading, spacing: Theme.space(7)) {
             HeroView(item: Fixtures.complete, onPlay: { _ in }, onDetails: { _ in })
 
             ForEach(Fixtures.rails.prefix(2)) { rail in
