@@ -31,13 +31,32 @@ app="${out}/${app_name}.app"
 
 say () { printf '\n\033[1m%s\033[0m\n' "$*"; }
 
-say "building universal (arm64 + x86_64)"
-# Both architectures in one binary. An Intel Mac in the household should not
-# need a different download, and Rosetta on Apple Silicon is a worse experience
-# than a native slice for the sake of ~30MB.
-swift build -c release --arch arm64 --arch x86_64
+say "building"
+# ☠️ NOT `swift build --arch arm64 --arch x86_64`.
+#
+# Passing two architectures to one invocation makes SwiftPM hand the build to
+# Xcode's build system, which then fails with a wall of "duplicate output file
+# .../TitleView.o" — every source file in the target, once per architecture.
+# Nothing in the message says "you asked for two architectures".
+#
+# Two separate invocations plus `lipo` does work, and has the additional virtue
+# that the second one is allowed to fail: an Intel slice is a courtesy, and the
+# absence of one should not cost the household a build.
+swift build -c release
+native="$(swift build -c release --show-bin-path)/${app_name}"
 
-binary="$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)/${app_name}"
+staged="$(mktemp -d)/${app_name}"
+
+if swift build -c release --arch x86_64 >/dev/null 2>&1; then
+    intel="$(swift build -c release --arch x86_64 --show-bin-path)/${app_name}"
+    lipo -create -output "$staged" "$native" "$intel"
+    say "universal: $(lipo -archs "$staged")"
+else
+    cp "$native" "$staged"
+    say "NOTE: the Intel slice did not build; shipping $(lipo -archs "$staged") only"
+fi
+
+binary="$staged"
 
 say "assembling the bundle"
 rm -rf "$app"
