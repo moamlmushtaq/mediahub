@@ -74,6 +74,21 @@ jobs:
       - name: Build the bundle
         run: ./Packaging/package.sh
 
+      # The whole point. This project is developed on Linux; without these the
+      # interface is shipped unseen, which has now happened three times and
+      # come back "it looks very bad" three times.
+      - name: Render the screens
+        run: |
+          ./dist/MediaHub.app/Contents/MacOS/MediaHub --snapshot "$PWD/screens"
+          ls -la screens
+
+      - name: Upload the screens
+        uses: actions/upload-artifact@v4
+        with:
+          name: screens
+          path: screens/*.png
+          if-no-files-found: error
+
       # Uploaded on every green build rather than only on a tag: the machine
       # this is developed on is not a Mac, so this artifact is the only way the
       # author ever gets to hold the thing they wrote.

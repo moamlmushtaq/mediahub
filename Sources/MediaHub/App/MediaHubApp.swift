@@ -7,7 +7,23 @@ import MediaHubKit
 /// `MediaHubKit`, because this target can only be compiled on a Mac while the
 /// kit compiles and tests anywhere — so every decision that lives up here is a
 /// decision that stops being covered by tests.
+/// The process entry point.
+///
+/// A custom `main` rather than `@main` on the `App`, so that `--snapshot` can
+/// be handled before SwiftUI takes over the run loop. Once `App.main()` is
+/// called there is no way back — it never returns — so the branch has to happen
+/// above it.
 @main
+enum Entry {
+    static func main() {
+        if let directory = CommandLine.snapshotDirectory {
+            MainActor.assumeIsolated { Snapshots.run(into: directory) }
+            exit(0)
+        }
+        MediaHubApp.main()
+    }
+}
+
 struct MediaHubApp: App {
     @State private var app = AppModel()
 

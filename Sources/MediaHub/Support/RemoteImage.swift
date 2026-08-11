@@ -42,6 +42,12 @@ final class ImageCache {
         cache.object(forKey: url as NSURL)
     }
 
+    /// Places an image in the cache directly. Used by the snapshot renderer so
+    /// screenshots show a full layout rather than a grid of empty placeholders.
+    func store(_ image: NSImage, for url: URL) {
+        cache.setObject(image, forKey: url as NSURL)
+    }
+
     func load(_ url: URL) async -> NSImage? {
         if let hit = cached(url) { return hit }
 
