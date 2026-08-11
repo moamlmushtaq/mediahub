@@ -100,11 +100,38 @@ struct HeroView: View {
     private var isResuming: Bool { item.startingPoint.rawValue > 0 }
 
     var body: some View {
-        // `.leading`, not `.trailing`. In a right-to-left layout SwiftUI maps
-        // leading to the RIGHT edge — the first version used trailing and put
-        // the title, the summary and both buttons in the bottom-left corner of
-        // an Arabic screen.
-        ZStack(alignment: .bottomLeading) {
+        // Two things here, and both were bugs before.
+        //
+        // `.bottomLeading` — in a right-to-left layout SwiftUI maps leading to
+        // the RIGHT edge. The first version used trailing and put the title,
+        // the summary and both buttons in the bottom-left corner of an Arabic
+        // screen.
+        //
+        // And the artwork is a BACKGROUND, not a sibling in a stack.
+        //
+        // As a sibling it broke the hero completely: `RemoteImage` reports an
+        // infinite ideal size so that it fills whatever it is given, and a
+        // ZStack sizes itself to its largest child — so the stack grew without
+        // bound, the bottom-aligned text landed far below the 520-point window,
+        // and `.clipped()` removed it. The hero rendered as a backdrop with no
+        // title, no metadata and no buttons.
+        //
+        // `.background` is measured by the content it sits behind, so the text
+        // decides the size and the picture fills it. That is the right way
+        // round, and it cannot come apart again.
+        details
+            .frame(maxWidth: .infinity, alignment: .bottomLeading)
+            .frame(height: Self.height, alignment: .bottomLeading)
+            .background(alignment: .center) { backdrop }
+            .clipped()
+    }
+
+    /// Tall enough to be a statement, short enough that the first rail shows
+    /// underneath and says there is more below.
+    static let height: CGFloat = 520
+
+    private var backdrop: some View {
+        ZStack {
             RemoteImage(url: item.backdropURL(.backdropLarge), contentMode: .fill)
 
             // The scrims exist to make text legible, and the first version made
@@ -135,17 +162,8 @@ struct HeroView: View {
                 startPoint: UnitPoint(x: 1, y: 0.5),
                 endPoint: UnitPoint(x: 0, y: 0.5)
             )
-
-            details
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: Self.height)
-        .clipped()
     }
-
-    /// Tall enough to be a statement, short enough that the first rail shows
-    /// underneath and says there is more below.
-    static let height: CGFloat = 520
 
     private var details: some View {
         VStack(alignment: .leading, spacing: Theme.space(3)) {
